@@ -20,29 +20,46 @@ library(ggforce)
 ui <- fluidPage(
 
     # Application title
-    titlePanel("How does the number of survivors change\nwith mutation rate, fitness effect\nand death rate?"),
+    titlePanel("BIOL336: How does the number of survivors change with mutation rate and mutant fitness?"),
 
     # Sidebar with a slider input for number of bins 
     sidebarLayout(
         sidebarPanel(
             
             shinyWidgets::sliderTextInput("m","Mutation Rate:",
-                                          choices=c( 1.00e-07, 1.67e-07, 2.78e-07 ,
-                                                     4.64e-07 ,7.74e-07, 1.29e-06 ,
-                                                     2.15e-06, 3.59e-06 ,5.99e-06,
+                                          choices=c( 1.00e-07, 2e-07, 
+                                                     5e-07 ,8e-07, 1e-06 ,
+                                                     2e-06, 4e-06 ,6e-06,
                                                     1.00e-05),
-                                          selected= 1.29e-06, grid = T),
+                                          selected= 1e-06, grid = T),
             sliderInput(inputId = "s", label = "Mutant Fitness", value = 1, 
-                        min = 0.2, max = 1.5, step = 0.1),
-            actionButton("update" ,"Update View", icon("refresh"),
-                         class = "btn btn-primary")
+                      min = 0.2, max = 1.5, step = 0.1)#,
+           
+            # shinyWidgets::sliderTextInput("d","Death Rate:",
+            #                               choices=c( 0,1e-3,3e-3,1e-2,3e-2,1e-1,3e-1),
+            #                               selected= 0, grid = T)#  ,
+            # actionButton("update" ,"Update View", icon("refresh"),
+            #              class = "btn btn-primary")
+            ,
+            tags$figure(
+              class = "centerFigure",
+              tags$img(
+                src = "diagram.png",
+                width = 400,
+                alt = "Cartoon of population growth during which mutations accumulate followed by selection for mutants"
+              ),
+              tags$figcaption("")
+            )
         ),
 
         # Show a plot of the generated distribution
         mainPanel(
           #plotOutput("plot_phylo"),
-          plotOutput("plot")
+          plotOutput("plot"),
            #plotOutput("distPlot")
+          #textOutput("text"),
+          verbatimTextOutput("verb"),
+          verbatimTextOutput("verb2")
         )
     )
 )
@@ -50,14 +67,31 @@ ui <- fluidPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
   
-  output$plot_phylo<-renderPlot({
-    flan::draw.clone(t=6,col=c('black','red'),mutprob=0.06,
-                     dist=list(name="dirac",location=1))
-  })
+  
+  
+  # output$text <- renderText({ 
+  #   rflan(1e4,mutprob=input$m,mfn=1e6,
+  #         fitness = 1/input$s,death=input$d,
+  #         dist=list("lnorm",meanlog=-0.3795851,sdlog=0.3016223))$mc->mc
+  #   paste0("Median Number of Survivors: ",median(mc)) })
+  output$verb <- renderText({ 
+    rflan(1e4,mutprob=input$m,mfn=1e6,
+          fitness = 1/input$s,#death=input$d,
+          dist=list("lnorm",meanlog=-0.3795851,sdlog=0.3016223))$mc->mc
+    paste0("Median Number of Survivors: ",median(mc)," (N trials = 10,000)"  )})
+  output$verb2 <- renderText({ 
+    dflan(0,mutations=input$m*1e6,
+          fitness = 1/input$s)%>%signif(3)->p0
+    paste0("Probability of ≥1 survivor: ",1-p0)  })
+  
+  # output$plot_phylo<-renderPlot({
+  #   flan::draw.clone(t=6,col=c('black','red'),mutprob=0.06,
+  #                    dist=list(name="dirac",location=1))
+  # })
   
   output$plot<-renderPlot({
     rflan(18,mutprob=input$m,mfn=1e6,
-                     fitness = 1/input$s,death=0,
+                     fitness = 1/input$s,#death=input$d,
                      dist=list("lnorm",meanlog=-0.3795851,sdlog=0.3016223))$mc->mc
     
     
@@ -90,7 +124,8 @@ server <- function(input, output) {
       # part 3 -- combine circle and points
       p_empty_circle +
         geom_point(data = df_circular_points_scatter, 
-                   aes(x = x, y = y))+
+                   aes(x = x, y = y),
+                   col='red')+
         ggtitle(n)
     }
     
