@@ -32,7 +32,7 @@ ui <- fluidPage(
                                                      2e-06, 4e-06 ,6e-06,
                                                     1.00e-05),
                                           selected= 1e-06, grid = T),
-            sliderInput(inputId = "s", label = "Mutant Fitness", value = 1, 
+            sliderInput(inputId = "s", label = "Mutant Fitness Prior to Antibiotics:", value = 1, 
                       min = 0.2, max = 1.5, step = 0.1)#,
            
             # shinyWidgets::sliderTextInput("d","Death Rate:",
