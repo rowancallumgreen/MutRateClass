@@ -172,7 +172,7 @@ server <- function(input, output) {
                             p1000_17,
                             p1000_18,
                             nrow = 3,
-                            top="12 Example Populations (1 million individuals)\n Mutant Survivors Shown")
+                            top="18 Example Populations (1 million individuals)\n Mutant Survivors Shown")
     
     
   })
