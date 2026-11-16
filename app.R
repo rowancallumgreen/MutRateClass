@@ -20,7 +20,7 @@ library(ggforce)
 ui <- fluidPage(
 
     # Application title
-    titlePanel("BIOL336: How does the number of survivors change with mutation rate and mutant fitness?"),
+    titlePanel("BIOL336: Muutation Rate Starter"),
 
     # Sidebar with a slider input for number of bins 
     sidebarLayout(
