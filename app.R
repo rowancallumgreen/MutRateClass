@@ -20,7 +20,7 @@ library(ggforce)
 ui <- fluidPage(
 
     # Application title
-    titlePanel("BIOL336: Muutation Rate Starter"),
+    titlePanel("BIOL336: Mutation Rate Starter"),
 
     # Sidebar with a slider input for number of bins 
     sidebarLayout(
